@@ -3,3 +3,8 @@ pymongo==3.12.1
 requests==2.26.0
 opentelemetry-distro==0.48b0
 opentelemetry-exporter-otlp==1.27.0
+# Add these lines:
+opentelemetry-instrumentation-flask==0.48b0
+opentelemetry-instrumentation-requests==0.48b0
+opentelemetry-instrumentation-logging==0.48b0
+azure-monitor-opentelemetry-exporter ~= 1.0.0b31

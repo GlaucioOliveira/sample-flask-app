@@ -8,6 +8,19 @@ from random import randrange
 
 from opentelemetry.metrics import get_meter_provider
 
+import logging
+
+# --- IMPORT ADDED ---
+from opentelemetry.instrumentation.logging import LoggingInstrumentor
+
+# --- ACTIVATE LOGGING INSTRUMENTATION ---
+# This line grabs all standard logs and sends them to SigNoz/OTel
+LoggingInstrumentor().instrument(set_logging_to_handler=True)
+
+# Configure console logging (so you can still see them in Docker logs)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 app = Flask(__name__)
 title = "TODO sample application with Flask and MongoDB"
 heading = "TODO Reminder with Flask and MongoDB"
@@ -22,6 +35,19 @@ meter = get_meter_provider().get_meter("sample-flask-app", "0.1.2")
 
 todo_counter = meter.create_up_down_counter("todo_count")
 
+# --- LOGGING HOOKS ADDED ---
+@app.before_request
+def log_before_request():
+    """Logs before the route function is called."""
+    logger.info(f"Started processing request: {request.method} {request.path}")
+
+@app.after_request
+def log_after_request(response):
+    """Logs after the route function returns."""
+    logger.info(f"Finished processing request: {request.method} {request.path} - Status: {response.status}")
+    return response
+# ---------------------------
+
 def redirect_url():
     return request.args.get('next') or \
            request.referrer or \
@@ -33,11 +59,15 @@ def health_check():
 
 @app.route("/list")
 def lists ():
+		# mock API call
+		try:
+			response = requests.get('https://google.comx')
+		except Exception as e:
+			logger.error(f"External API failed: {e}")
+		
 		#Display the all Tasks
 		todos_l = todos.find()
 		a1="active"
-		# mock API call
-		response = requests.get('https://google.com')
 
 		return render_template('index.html',a1=a1,todos=todos_l,t=title,h=heading), 500
 

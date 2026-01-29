@@ -12,14 +12,14 @@ services:
       - 27017:27017
 
   sample-flask:
-    image: "signoz/sample-flask-app:latest"
+#    image: "signoz/sample-flask-app:latest"
+    build: .
     container_name: sample-flask
     hostname: sample-flask
     ports:
       - 5002:5002
-    extra_hosts:
-      - signoz:host-gateway
     environment:
       MONGO_URI: mongodb://root:examplepwd@mongodb:27017
       OTEL_RESOURCE_ATTRIBUTES: service.name=sample-flask
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://signoz:4317  # Replace to appropriate SigNoz OtelCollector endpoint, if applicable
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://192.168.8.204:4317  # Replace to appropriate SigNoz OtelCollector endpoint, if applicable
+      OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED: true
